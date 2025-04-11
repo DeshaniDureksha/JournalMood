@@ -53,8 +53,8 @@ User Input → Component State → Context API → AsyncStorage → Context API 
 ### Installation Steps
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/mood-journal.git
-   cd mood-journal
+   https://github.com/DeshaniDureksha/JournalMood.git
+   cd JournalMood
    ```
 
 2. Install dependencies
