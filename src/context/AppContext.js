@@ -11,7 +11,6 @@ export const AppProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Mood options that will be used throughout the app
   const moodOptions = [
     { value: 'amazing', label: 'Amazing', emoji: '😁', color: '#10b981' },
     { value: 'good', label: 'Good', emoji: '😊', color: '#60a5fa' },
@@ -20,12 +19,10 @@ export const AppProvider = ({ children }) => {
     { value: 'terrible', label: 'Terrible', emoji: '😭', color: '#ef4444' },
   ];
 
-  // Load entries from storage on app start
   useEffect(() => {
     loadEntries();
   }, []);
 
-  // Load entries from AsyncStorage
   const loadEntries = async () => {
     try {
       setLoading(true);
@@ -41,7 +38,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Save entries to AsyncStorage
   const saveEntries = async (updatedEntries) => {
     try {
       await AsyncStorage.setItem('journalEntries', JSON.stringify(updatedEntries));
@@ -52,10 +48,9 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Add a new entry
   const addEntry = async (content, mood, imageUri) => {
     try {
-      const timestamp = new Date().toISOString();
+      const timestamp = new Date().toISOString(); // ✅ fresh timestamp for each entry
       const newEntry = {
         id: uuid.v4(),
         content,
@@ -75,7 +70,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Update an existing entry
   const updateEntry = async (entryId, updates) => {
     try {
       const updatedEntries = entries.map(entry =>
@@ -91,7 +85,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Delete an entry
   const deleteEntry = async (entryId) => {
     try {
       const updatedEntries = entries.filter(entry => entry.id !== entryId);
@@ -104,47 +97,46 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Get a single entry by ID
   const getEntryById = (entryId) => {
     return entries.find(entry => entry.id === entryId);
   };
 
-  // Group entries by date (for the journal list screen)
   const getEntriesByDate = () => {
     const grouped = {};
-    
-    entries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(entry => {
-      const date = entry.timestamp.split('T')[0]; // Get YYYY-MM-DD part
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-      grouped[date].push(entry);
-    });
-    
+
+    entries
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .forEach(entry => {
+        // ✅ Group by local date using toLocaleDateString
+        const date = new Date(entry.timestamp).toLocaleDateString('en-CA'); // YYYY-MM-DD
+        if (!grouped[date]) {
+          grouped[date] = [];
+        }
+        grouped[date].push(entry);
+      });
+
     return grouped;
   };
 
-  // Get entries grouped by month for visualization
   const getEntriesByMonth = () => {
     const grouped = {};
-    
+
     entries.forEach(entry => {
       const date = new Date(entry.timestamp);
       const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      
+
       if (!grouped[monthYear]) {
         grouped[monthYear] = [];
       }
       grouped[monthYear].push(entry);
     });
-    
+
     return grouped;
   };
 
-  // Get mood distribution data for visualization
   const getMoodData = () => {
     const moodCounts = {};
-    
+
     moodOptions.forEach(mood => {
       moodCounts[mood.value] = {
         count: 0,
@@ -153,37 +145,34 @@ export const AppProvider = ({ children }) => {
         emoji: mood.emoji
       };
     });
-    
+
     entries.forEach(entry => {
       if (moodCounts[entry.mood]) {
         moodCounts[entry.mood].count++;
       }
     });
-    
+
     return Object.values(moodCounts);
   };
 
-  // Get entry count by weekday for visualization
   const getEntryCountByWeekday = () => {
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const counts = Array(7).fill(0);
-    
+
     entries.forEach(entry => {
       const date = new Date(entry.timestamp);
       const dayOfWeek = date.getDay();
       counts[dayOfWeek]++;
     });
-    
+
     return weekdays.map((day, index) => ({
       name: day,
       count: counts[index],
     }));
   };
 
-  // Pick an image from gallery
   const pickImage = async () => {
     try {
-      // Request permission first
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
@@ -191,14 +180,14 @@ export const AppProvider = ({ children }) => {
           return null;
         }
       }
-      
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
       });
-      
+
       if (!result.canceled) {
         return result.assets[0].uri;
       }
@@ -210,10 +199,8 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Clear error state
   const clearError = () => setError(null);
 
-  // Context value
   const value = {
     entries,
     loading,

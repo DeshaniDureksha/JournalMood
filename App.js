@@ -12,12 +12,13 @@ import AddEntryScreen from './src/screens/AddEntryScreen';
 import EditEntryScreen from './src/screens/EditEntryScreen';
 import EntryDetailScreen from './src/screens/EntryDetailScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen'; // ✅ NEW
 
-// Create navigators
+// Navigators
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Journal stack navigator
+// Journal Stack
 const JournalStack = () => {
   return (
     <Stack.Navigator
@@ -31,7 +32,6 @@ const JournalStack = () => {
         headerTitleStyle: {
           fontWeight: '600',
         },
-        // Simplify headers for non-tab screens
         headerTitleAlign: 'center',
       }}
     >
@@ -40,26 +40,23 @@ const JournalStack = () => {
         component={JournalListScreen} 
         options={{ 
           title: 'My Journal',
-          // Keep full header for main tab screen
           headerLeft: () => null,
         }}
       />
       <Stack.Screen 
         name="AddEntry" 
         component={AddEntryScreen} 
-        options={({ navigation }) => ({ 
+        options={{ 
           title: 'New Entry',
-          // Only show title and back button
           headerBackTitleVisible: false,
           headerShadowVisible: false,
-        })}
+        }}
       />
       <Stack.Screen 
         name="EditEntry" 
         component={EditEntryScreen} 
         options={{ 
           title: 'Edit Entry',
-          // Only show title and back button
           headerBackTitleVisible: false,
           headerShadowVisible: false,
         }}
@@ -69,7 +66,6 @@ const JournalStack = () => {
         component={EntryDetailScreen} 
         options={{ 
           title: 'Journal Entry',
-          // Only show title and back button
           headerBackTitleVisible: false,
           headerShadowVisible: false,
         }}
@@ -78,7 +74,7 @@ const JournalStack = () => {
   );
 };
 
-// Dashboard stack navigator
+// Dashboard Stack
 const DashboardStack = () => {
   return (
     <Stack.Navigator
@@ -100,7 +96,6 @@ const DashboardStack = () => {
         component={DashboardScreen} 
         options={{ 
           title: 'Dashboard',
-          // Keep full header for main tab screen
           headerLeft: () => null,
         }}
       />
@@ -108,20 +103,18 @@ const DashboardStack = () => {
   );
 };
 
-// Main tab navigator
+// Tab Navigator
 const TabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          
           if (route.name === 'Journal') {
             iconName = focused ? 'journal' : 'journal-outline';
           } else if (route.name === 'Dashboard') {
             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
           }
-          
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#6366f1',
@@ -154,12 +147,20 @@ const TabNavigator = () => {
   );
 };
 
+// Main App
 export default function App() {
+  const isFirstLaunch = true; // ✅ Always true – shows onboarding every time
+
   return (
     <AppProvider>
       <NavigationContainer>
         <StatusBar style="light" />
-        <TabNavigator />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isFirstLaunch && (
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          )}
+          <Stack.Screen name="MainApp" component={TabNavigator} />
+        </Stack.Navigator>
       </NavigationContainer>
     </AppProvider>
   );
