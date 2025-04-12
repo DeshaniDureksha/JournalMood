@@ -66,7 +66,7 @@ User Input → Component State → Context API → AsyncStorage → Context API 
 
 3. Start the development server
    ```bash
-   expo start
+   npx expo start
    ```
 
 4. Run on desired platform
