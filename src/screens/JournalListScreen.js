@@ -9,15 +9,16 @@ import {
   Image,
   Alert
 } from 'react-native';
-import { format, parseISO } from 'date-fns';
-import { useApp } from '../context/AppContext';
-import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { format, parseISO } from 'date-fns'; // For formatting date/time
+import { useApp } from '../context/AppContext'; // Custom context for app data
+import { Ionicons } from '@expo/vector-icons'; // Icon set
+import { useFocusEffect } from '@react-navigation/native'; // Hook to run code when screen is focused
 
 const JournalListScreen = ({ navigation }) => {
   const { getEntriesByDate, loading, error, clearError, deleteEntry } = useApp();
   const [refreshing, setRefreshing] = useState(false);
 
+  // Show alert if there's an error when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
       if (error) {
@@ -27,12 +28,13 @@ const JournalListScreen = ({ navigation }) => {
     }, [error, clearError])
   );
 
+  // Pull-to-refresh handler
   const handleRefresh = () => {
     setRefreshing(true);
-    // Force refresh by waiting a moment before setting refreshing back to false
-    setTimeout(() => setRefreshing(false), 1000);
+    setTimeout(() => setRefreshing(false), 1000); // Simulate refresh
   };
 
+  // Confirm and delete entry
   const handleDeleteEntry = (entryId) => {
     Alert.alert(
       'Delete Entry',
@@ -48,6 +50,7 @@ const JournalListScreen = ({ navigation }) => {
     );
   };
 
+  // Render a single journal entry card
   const renderEntryItem = ({ item }) => {
     const mood = {
       amazing: { emoji: '😁', color: '#10b981' },
@@ -62,6 +65,7 @@ const JournalListScreen = ({ navigation }) => {
         style={styles.entryCard}
         onPress={() => navigation.navigate('EntryDetail', { entryId: item.id })}
       >
+        {/* Mood and timestamp */}
         <View style={styles.entryHeader}>
           <View style={[styles.moodIndicator, { backgroundColor: mood.color }]}>
             <Text style={styles.moodEmoji}>{mood.emoji}</Text>
@@ -71,11 +75,9 @@ const JournalListScreen = ({ navigation }) => {
           </Text>
         </View>
 
+        {/* Entry text and image */}
         <View style={styles.entryContent}>
-          <Text 
-            style={styles.entryText}
-            numberOfLines={3}
-          >
+          <Text style={styles.entryText} numberOfLines={3}>
             {item.content}
           </Text>
           
@@ -88,6 +90,7 @@ const JournalListScreen = ({ navigation }) => {
           )}
         </View>
 
+        {/* Edit and Delete buttons */}
         <View style={styles.entryActions}>
           <TouchableOpacity 
             style={styles.actionButton}
@@ -109,10 +112,11 @@ const JournalListScreen = ({ navigation }) => {
     );
   };
 
+  // Render entries grouped by date
   const renderDateGroup = ({ item }) => {
     const [dateStr, entries] = item;
     const dateObj = new Date(dateStr);
-    
+
     return (
       <View style={styles.dateGroup}>
         <View style={styles.dateHeader}>
@@ -135,8 +139,9 @@ const JournalListScreen = ({ navigation }) => {
   };
 
   const entriesByDate = getEntriesByDate();
-  const dateGroups = Object.entries(entriesByDate);
+  const dateGroups = Object.entries(entriesByDate); // Convert object to array of [date, entries]
 
+  // Show loading spinner while fetching
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -147,6 +152,7 @@ const JournalListScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* If no entries, show empty state */}
       {dateGroups.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="journal-outline" size={80} color="#d1d5db" />
@@ -166,6 +172,7 @@ const JournalListScreen = ({ navigation }) => {
         />
       )}
 
+      {/* Floating Add Entry Button */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddEntry')}

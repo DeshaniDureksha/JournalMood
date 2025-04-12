@@ -16,16 +16,20 @@ import { useApp } from '../context/AppContext';
 import { Ionicons } from '@expo/vector-icons';
 
 const EditEntryScreen = ({ route, navigation }) => {
+  // Get entryId from navigation route params
   const { entryId } = route.params;
+
+  // Destructure context values
   const { getEntryById, moodOptions, updateEntry, pickImage, error, clearError, loading } = useApp();
   
+  // Local state to manage the current entry data
   const [entry, setEntry] = useState(null);
   const [content, setContent] = useState('');
   const [selectedMood, setSelectedMood] = useState('okay');
   const [image, setImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Load entry data
+  // Fetch the entry data when the component mounts
   useEffect(() => {
     const entryData = getEntryById(entryId);
     if (entryData) {
@@ -39,7 +43,7 @@ const EditEntryScreen = ({ route, navigation }) => {
     }
   }, [entryId, getEntryById]);
   
-  // Show error if present
+  // Display error alerts if any
   useEffect(() => {
     if (error) {
       Alert.alert('Error', error);
@@ -47,6 +51,7 @@ const EditEntryScreen = ({ route, navigation }) => {
     }
   }, [error, clearError]);
   
+  // Open image picker and set the selected image
   const handleAddImage = async () => {
     const selectedImage = await pickImage();
     if (selectedImage) {
@@ -54,10 +59,12 @@ const EditEntryScreen = ({ route, navigation }) => {
     }
   };
   
+  // Remove the currently selected image
   const handleRemoveImage = () => {
     setImage(null);
   };
   
+  // Submit the updated entry
   const handleSubmit = async () => {
     if (content.trim() === '') {
       Alert.alert('Error', 'Please write something in your journal entry');
@@ -80,6 +87,7 @@ const EditEntryScreen = ({ route, navigation }) => {
     }
   };
   
+  // Show loading indicator until the entry is ready
   if (loading || !entry) {
     return (
       <View style={styles.centered}>
@@ -95,6 +103,7 @@ const EditEntryScreen = ({ route, navigation }) => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
       <ScrollView style={styles.container}>
+        {/* Mood Selection */}
         <View style={styles.moodSelector}>
           <Text style={styles.moodLabel}>How are you feeling?</Text>
           <View style={styles.moodOptions}>
@@ -121,6 +130,7 @@ const EditEntryScreen = ({ route, navigation }) => {
           </View>
         </View>
       
+        {/* Text Input Field */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -132,6 +142,7 @@ const EditEntryScreen = ({ route, navigation }) => {
           />
         </View>
       
+        {/* Image Preview or Add Button */}
         {image ? (
           <View style={styles.imagePreviewContainer}>
             <Image source={{ uri: image }} style={styles.imagePreview} />
@@ -153,6 +164,7 @@ const EditEntryScreen = ({ route, navigation }) => {
         )}
       </ScrollView>
     
+      {/* Footer Buttons */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.cancelButton}
@@ -181,6 +193,7 @@ const EditEntryScreen = ({ route, navigation }) => {
   );
 };
 
+// Styling definitions
 const styles = StyleSheet.create({
   container: {
     flex: 1,

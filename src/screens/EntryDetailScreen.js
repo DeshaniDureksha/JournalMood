@@ -9,16 +9,21 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { format, parseISO } from 'date-fns';
-import { useApp } from '../context/AppContext';
-import { Ionicons } from '@expo/vector-icons';
+import { format, parseISO } from 'date-fns'; // For formatting timestamps
+import { useApp } from '../context/AppContext'; // Custom context hook
+import { Ionicons } from '@expo/vector-icons'; // Icon pack
 
 const EntryDetailScreen = ({ route, navigation }) => {
+  // Retrieve entryId from route parameters
   const { entryId } = route.params;
+
+  // Get necessary functions and data from context
   const { getEntryById, moodOptions, deleteEntry, loading } = useApp();
-  
+
+  // Fetch the specific entry by ID
   const entry = getEntryById(entryId);
-  
+
+  // Show loading spinner while fetching
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -26,7 +31,8 @@ const EntryDetailScreen = ({ route, navigation }) => {
       </View>
     );
   }
-  
+
+  // If entry is not found, show error
   if (!entry) {
     return (
       <View style={styles.centered}>
@@ -40,9 +46,11 @@ const EntryDetailScreen = ({ route, navigation }) => {
       </View>
     );
   }
-  
-  const moodInfo = moodOptions.find(m => m.value === entry.mood) || moodOptions[2]; // Default to "okay"
-  
+
+  // Get mood details based on the mood value in the entry
+  const moodInfo = moodOptions.find(m => m.value === entry.mood) || moodOptions[2]; // Default to "okay" mood
+
+  // Handle delete confirmation
   const handleDelete = () => {
     Alert.alert(
       'Delete Entry',
@@ -53,23 +61,25 @@ const EntryDetailScreen = ({ route, navigation }) => {
           text: 'Delete', 
           style: 'destructive',
           onPress: () => {
-            deleteEntry(entryId);
-            navigation.goBack();
+            deleteEntry(entryId); // Delete from storage
+            navigation.goBack(); // Return to previous screen
           }
         }
       ]
     );
   };
-  
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header showing mood, date and time */}
         <View style={styles.header}>
           <View style={[styles.moodBadge, { backgroundColor: moodInfo.color }]}>
             <Text style={styles.moodEmoji}>{moodInfo.emoji}</Text>
             <Text style={styles.moodText}>{moodInfo.label}</Text>
           </View>
-          
+
+          {/* Formatted date and time */}
           <Text style={styles.date}>
             {format(parseISO(entry.timestamp), 'EEEE, MMMM d, yyyy')}
           </Text>
@@ -77,14 +87,17 @@ const EntryDetailScreen = ({ route, navigation }) => {
             {format(parseISO(entry.timestamp), 'h:mm a')}
           </Text>
         </View>
-        
+
+        {/* Display image if available */}
         {entry.image && (
           <Image source={{ uri: entry.image }} style={styles.image} resizeMode="cover" />
         )}
-        
+
+        {/* Display journal content */}
         <Text style={styles.content}>{entry.content}</Text>
       </ScrollView>
-      
+
+      {/* Edit and Delete buttons at the bottom */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.editButton}
@@ -93,7 +106,7 @@ const EntryDetailScreen = ({ route, navigation }) => {
           <Ionicons name="pencil" size={20} color="#ffffff" />
           <Text style={styles.buttonText}>Edit Entry</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={handleDelete}
@@ -106,6 +119,7 @@ const EntryDetailScreen = ({ route, navigation }) => {
   );
 };
 
+// Style definitions
 const styles = StyleSheet.create({
   container: {
     flex: 1,

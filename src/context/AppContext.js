@@ -7,10 +7,11 @@ import uuid from 'react-native-uuid';
 const AppContext = createContext({});
 
 export const AppProvider = ({ children }) => {
-  const [entries, setEntries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [entries, setEntries] = useState([]); // All journal entries
+  const [loading, setLoading] = useState(true); // For loading state on app load
+  const [error, setError] = useState(null); // To hold any error messages
 
+  // Mood options available in the app
   const moodOptions = [
     { value: 'amazing', label: 'Amazing', emoji: '😁', color: '#10b981' },
     { value: 'good', label: 'Good', emoji: '😊', color: '#60a5fa' },
@@ -19,16 +20,18 @@ export const AppProvider = ({ children }) => {
     { value: 'terrible', label: 'Terrible', emoji: '😭', color: '#ef4444' },
   ];
 
+  // Load entries from AsyncStorage on app start
   useEffect(() => {
     loadEntries();
   }, []);
 
+  // Loads journal entries from storage
   const loadEntries = async () => {
     try {
       setLoading(true);
       const storedEntries = await AsyncStorage.getItem('journalEntries');
       if (storedEntries) {
-        setEntries(JSON.parse(storedEntries));
+        setEntries(JSON.parse(storedEntries)); // Set entries if found
       }
     } catch (err) {
       setError('Failed to load your journal entries');
@@ -38,6 +41,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Saves journal entries to AsyncStorage
   const saveEntries = async (updatedEntries) => {
     try {
       await AsyncStorage.setItem('journalEntries', JSON.stringify(updatedEntries));
@@ -48,11 +52,12 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Adds a new journal entry
   const addEntry = async (content, mood, imageUri) => {
     try {
-      const timestamp = new Date().toISOString(); // ✅ fresh timestamp for each entry
+      const timestamp = new Date().toISOString(); // Current date & time
       const newEntry = {
-        id: uuid.v4(),
+        id: uuid.v4(), // Unique ID
         content,
         mood,
         image: imageUri,
@@ -60,8 +65,8 @@ export const AppProvider = ({ children }) => {
       };
 
       const updatedEntries = [...entries, newEntry];
-      setEntries(updatedEntries);
-      await saveEntries(updatedEntries);
+      setEntries(updatedEntries); // Update local state
+      await saveEntries(updatedEntries); // Persist to storage
       return newEntry.id;
     } catch (err) {
       setError('Failed to save your journal entry');
@@ -70,6 +75,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Updates an existing entry by ID
   const updateEntry = async (entryId, updates) => {
     try {
       const updatedEntries = entries.map(entry =>
@@ -85,6 +91,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Deletes an entry by ID
   const deleteEntry = async (entryId) => {
     try {
       const updatedEntries = entries.filter(entry => entry.id !== entryId);
@@ -97,18 +104,19 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Retrieves a single entry by ID
   const getEntryById = (entryId) => {
     return entries.find(entry => entry.id === entryId);
   };
 
+  // Groups entries by local date (YYYY-MM-DD)
   const getEntriesByDate = () => {
     const grouped = {};
 
     entries
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // Newest first
       .forEach(entry => {
-        // ✅ Group by local date using toLocaleDateString
-        const date = new Date(entry.timestamp).toLocaleDateString('en-CA'); // YYYY-MM-DD
+        const date = new Date(entry.timestamp).toLocaleDateString('en-CA'); // Format: YYYY-MM-DD
         if (!grouped[date]) {
           grouped[date] = [];
         }
@@ -118,6 +126,7 @@ export const AppProvider = ({ children }) => {
     return grouped;
   };
 
+  // Groups entries by month (YYYY-MM)
   const getEntriesByMonth = () => {
     const grouped = {};
 
@@ -134,6 +143,7 @@ export const AppProvider = ({ children }) => {
     return grouped;
   };
 
+  // Calculates how many entries for each mood type
   const getMoodData = () => {
     const moodCounts = {};
 
@@ -155,6 +165,7 @@ export const AppProvider = ({ children }) => {
     return Object.values(moodCounts);
   };
 
+  // Returns number of entries per day of the week (for bar chart)
   const getEntryCountByWeekday = () => {
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const counts = Array(7).fill(0);
@@ -171,6 +182,7 @@ export const AppProvider = ({ children }) => {
     }));
   };
 
+  // Opens image picker and returns image URI
   const pickImage = async () => {
     try {
       if (Platform.OS !== 'web') {
@@ -199,8 +211,10 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Clears current error state
   const clearError = () => setError(null);
 
+  // The context value available to the app
   const value = {
     entries,
     loading,
@@ -221,4 +235,5 @@ export const AppProvider = ({ children }) => {
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
+// Hook to use context easily
 export const useApp = () => useContext(AppContext);

@@ -3,19 +3,22 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const OnboardingScreen = ({ navigation }) => {
+  // When the "Get Started" button is pressed, navigate to the main app (TabNavigator)
   const handleContinue = () => {
-    navigation.replace('MainApp'); // Navigates to your TabNavigator
+    navigation.replace('MainApp'); // Navigates to TabNavigator
   };
 
   return (
     <View style={styles.container}>
-      {/* App icon or illustration */}
+      {/* Icon in a styled container */}
       <View style={styles.iconContainer}>
         <Ionicons name="journal" size={100} color="#6366f1" />
       </View>
 
-      {/* Title and subtitle */}
+      {/* Welcome title */}
       <Text style={styles.title}>Welcome to JournalMood</Text>
+
+      {/* Description below the title */}
       <Text style={styles.subtitle}>
         Start your journey of self-reflection and personal growth. Track your thoughts, moods, and progress every day.
       </Text>
@@ -30,16 +33,17 @@ const OnboardingScreen = ({ navigation }) => {
 
 export default OnboardingScreen;
 
+// Styles for the onboarding screen
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1, // Takes full height
     backgroundColor: '#ffffff',
     paddingHorizontal: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   iconContainer: {
-    backgroundColor: '#eef2ff',
+    backgroundColor: '#eef2ff', 
     padding: 32,
     borderRadius: 100,
     marginBottom: 32,
@@ -68,7 +72,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
-    elevation: 3,
+    elevation: 3, 
   },
   buttonText: {
     color: '#ffffff',

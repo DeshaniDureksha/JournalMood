@@ -380,8 +380,8 @@ const styles = StyleSheet.create({
   },
   barChartContainer: {
     alignItems: 'center',
-    paddingRight: 16, // Add padding to prevent overflow
-    overflow: 'hidden', // Hide any overflow
+    paddingRight: 16, 
+    overflow: 'hidden', 
   },
   moodLegend: {
     flexDirection: 'row',
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   footer: {
-    height: 80, // Space for the tab bar
+    height: 80, 
   },
 });
 

@@ -12,7 +12,7 @@ import AddEntryScreen from './src/screens/AddEntryScreen';
 import EditEntryScreen from './src/screens/EditEntryScreen';
 import EntryDetailScreen from './src/screens/EntryDetailScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen'; // ✅ NEW
+import OnboardingScreen from './src/screens/OnboardingScreen'; 
 
 // Navigators
 const Stack = createStackNavigator();
@@ -149,7 +149,7 @@ const TabNavigator = () => {
 
 // Main App
 export default function App() {
-  const isFirstLaunch = true; // ✅ Always true – shows onboarding every time
+  const isFirstLaunch = true; 
 
   return (
     <AppProvider>
